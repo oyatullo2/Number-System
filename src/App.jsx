@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 
 function App() {
-  const [placeholder, setPlaceholder] = useState(
-    "Enter the current number system"
-  );
+  const [placeholder, setPlaceholder] = useState("Enter the current number system");
   const [currentSystem, setCurrentSystem] = useState("");
   const [targetSystem, setTargetSystem] = useState("");
   const [result, setResult] = useState("");
@@ -50,56 +48,51 @@ function App() {
     return regex.test(value);
   };
 
-  // Handle input change with validation
-  const handleInputChange = (e) => {
-    const value = e.target.value;
-    if (validateInput(value)) {
-      setInputValue(value);
-    }
-  };
-
-  // Convert number system
   const convertNumber = () => {
+    let num = inputValue.trim();
+    if (!validateInput(num)) {
+      setResult("Invalid input");
+      return;
+    }
+
     let decimalValue;
-
-    if (!inputValue) return;
-
     switch (currentSystem) {
       case "binary":
-        decimalValue = parseInt(inputValue, 2);
-        break;
-      case "octal":
-        decimalValue = parseInt(inputValue, 8);
+        decimalValue = parseInt(num, 2);
         break;
       case "decimal":
-        decimalValue = parseInt(inputValue, 10);
+        decimalValue = parseInt(num, 10);
         break;
       case "hex":
-        decimalValue = parseInt(inputValue, 16);
+        decimalValue = parseInt(num, 16);
+        break;
+      case "octal":
+        decimalValue = parseInt(num, 8);
         break;
       default:
+        setResult("Invalid selection");
         return;
     }
 
-    let convertedValue;
+    let finalResult;
     switch (targetSystem) {
       case "binary":
-        convertedValue = decimalValue.toString(2);
-        break;
-      case "octal":
-        convertedValue = decimalValue.toString(8);
+        finalResult = decimalValue.toString(2).padStart(4, "0");
         break;
       case "decimal":
-        convertedValue = decimalValue.toString(10);
+        finalResult = decimalValue.toString(10);
         break;
       case "hex":
-        convertedValue = decimalValue.toString(16).toUpperCase();
+        finalResult = decimalValue.toString(16).toUpperCase();
+        break;
+      case "octal":
+        finalResult = decimalValue.toString(8);
         break;
       default:
+        setResult("Invalid selection");
         return;
     }
-
-    setResult(convertedValue);
+    setResult(finalResult);
   };
 
   return (
@@ -109,35 +102,34 @@ function App() {
           type="text"
           maxLength={15}
           value={inputValue}
-          onChange={handleInputChange}
+          onChange={(e) => {
+            if (validateInput(e.target.value)) {
+              setInputValue(e.target.value);
+            }
+          }}
+          onKeyDown={(e) => e.key === "Enter" && convertNumber()}
           className="rounded-md font-[700] outline-none w-full max-w-[450px] py-[7px] px-[10px]"
           placeholder={placeholder}
         />
 
-        {/* Current Number System Selection */}
         <select
           className="rounded-md font-[700] outline-none w-full max-w-[450px] py-[7px] px-[10px]"
           value={currentSystem}
           onChange={(e) => setCurrentSystem(e.target.value)}
         >
-          <option value="" disabled>
-            Enter the current number system
-          </option>
+          <option value="" disabled>Enter the current number system</option>
           <option value="binary">Binary</option>
           <option value="decimal">Decimal</option>
           <option value="hex">Hexadecimal</option>
           <option value="octal">Octal</option>
         </select>
 
-        {/* Target Number System Selection */}
         <select
           className="rounded-md font-[700] outline-none w-full max-w-[450px] py-[7px] px-[10px]"
           value={targetSystem}
           onChange={(e) => setTargetSystem(e.target.value)}
         >
-          <option value="" disabled>
-            Select the number system you want to convert to
-          </option>
+          <option value="" disabled>Select the number system you want to convert to</option>
           <option value="binary">Binary</option>
           <option value="decimal">Decimal</option>
           <option value="hex">Hexadecimal</option>
